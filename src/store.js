@@ -1,5 +1,6 @@
 const Store = () => {
   return {
+    darkTheme: false,
     component: "Login",
     subscribers: [],
     subscribe: function(s) {

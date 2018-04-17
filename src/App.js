@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import withWidth from 'material-ui/utils/withWidth';
 
 import Store from './store.js';
 import Routes from './routes.js';
@@ -35,10 +36,12 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <TopBar store={this.state.store} />
-        <Comp store={this.state.store} />
+        <div style={{width: '100%', marginTop: this.props.width === 'xs' ? 48 + 20 : 64 + 20, marginBottom: 20}}>
+          <Comp store={this.state.store} />
+        </div>
       </MuiThemeProvider>
     );
   }
 }
 
-export default App;
+export default withWidth()(App);

@@ -10,7 +10,6 @@ const Actions = {
   login: (store, username, password) => {
     return API.login(store.config.endpoint, username, password).then(auth => {
       store.auth = auth;
-    }).then(() => {
       console.log("routing to home screen")
     }).catch(err => {
       store.error = err.toString();
@@ -24,6 +23,8 @@ const API = {
     return fetch(endpoint + "/v1/auth/userpass/login/" + username, {
       body: JSON.stringify({ password: password }),
       method: "POST"
+    }).catch(err => {
+      return Promise.reject("unable to reach vault");
     }).then(response => {
       if (response.ok) {
         return response.json();

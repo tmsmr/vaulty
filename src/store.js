@@ -1,5 +1,8 @@
 const Store = () => {
   return {
+    config: {
+      endpoint: "http://127.0.0.1:8200"
+    },
     darkTheme: false,
     component: "Login",
     subscribers: [],

@@ -12,9 +12,47 @@ const Actions = {
     store.notify();
   },
   login: (store, username, password) => {
-    return API.login(store.config.endpoint, username, password).then(auth => {
+    API.login(store.config.endpoint, username, password).then(auth => {
       store.auth = auth;
-      console.log("routing to home screen")
+      Actions.open(store, "Secrets");
+    }).catch(err => {
+      store.error = err.toString();
+      store.notify();
+    });
+  },
+  loadSecrets: (store, path) => {
+    API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
+      list = list.keys;
+      list.sort();
+      let secrets = [];
+      for (let i in list) {
+        if (list[i].endsWith("/")) {
+          secrets.push({
+            item: list[i],
+            type: "folder"
+          });
+        } else {
+          secrets.push({
+            item: list[i],
+            type: "secret",
+            secret: null
+          });
+        }
+      }
+      store.secrets = secrets;
+      store.notify();
+    }).then(() => {
+      for (let i in store.secrets) {
+        if (store.secrets[i].type === "secret") {
+          API.get(store.config.endpoint, store.auth.client_token, path + store.secrets[i].item).then(secret => {
+            store.secrets[i].secret = secret.data.value;
+            store.notify();
+          }).catch(err => {
+            store.error = err.toString();
+            store.notify();
+          });
+        }
+      }
     }).catch(err => {
       store.error = err.toString();
       store.notify();
@@ -27,7 +65,7 @@ const API = {
     return fetch(endpoint + "/v1/auth/userpass/login/" + username, {
       body: JSON.stringify({password: password}),
       method: "POST"
-    }).catch(err => {
+    }).catch(() => {
       return Promise.reject("Unable to reach Vault backend");
     }).then(response => {
       if (response.ok) {
@@ -36,6 +74,40 @@ const API = {
       return Promise.reject("Invalid Vault login");
     }).then(body => {
       return body.auth;
+    });
+  },
+  list: (endpoint, token, path) => {
+    return fetch(endpoint + "/v1/secret/metadata" + path, {
+      headers: {
+        "X-Vault-Token": token
+      },
+      method: "LIST"
+    }).catch(() => {
+      return Promise.reject("Unable to reach Vault backend " + endpoint);
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      return Promise.reject("Unable to retrieve list for " + path);
+    }).then(body => {
+      return body.data;
+    });
+  },
+  get: (endpoint, token, path) => {
+    return fetch(endpoint + "/v1/secret/data" + path, {
+      headers: {
+        "X-Vault-Token": token
+      },
+      method: "GET"
+    }).catch(() => {
+      return Promise.reject("Unable to reach Vault backend " + endpoint);
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      return Promise.reject("Unable to retrieve secret " + path);
+    }).then(body => {
+      return body.data;
     });
   }
 };

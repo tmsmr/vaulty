@@ -69,6 +69,7 @@ EOF
 # insert some data
 ./vault kv put secret/foo value=bar
 ./vault kv put secret/bar value=foo
+./vault kv put secret/baz/foobar value=barfoo
 
 GR='\033[0;32m'
 NC='\033[0m'

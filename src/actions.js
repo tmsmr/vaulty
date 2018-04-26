@@ -66,7 +66,7 @@ const API = {
       body: JSON.stringify({password: password}),
       method: "POST"
     }).catch(() => {
-      return Promise.reject("Unable to reach Vault backend");
+      return Promise.reject("Unable to reach Vault endpoint");
     }).then(response => {
       if (response.ok) {
         return response.json();
@@ -83,7 +83,7 @@ const API = {
       },
       method: "LIST"
     }).catch(() => {
-      return Promise.reject("Unable to reach Vault backend " + endpoint);
+      return Promise.reject("Unable to reach Vault endpoint " + endpoint);
     }).then(response => {
       if (response.ok) {
         return response.json();
@@ -100,7 +100,7 @@ const API = {
       },
       method: "GET"
     }).catch(() => {
-      return Promise.reject("Unable to reach Vault backend " + endpoint);
+      return Promise.reject("Unable to reach Vault endpoint " + endpoint);
     }).then(response => {
       if (response.ok) {
         return response.json();

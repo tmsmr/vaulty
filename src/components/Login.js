@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
-import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 
 import Actions from '../actions';
@@ -18,11 +17,11 @@ class Login extends Component {
   }
 
   keypress(e) {
-    if(e.key === "Enter") {
+    if (e.key === "Enter") {
       this.login();
     }
   }
-  
+
   login() {
     Actions.login(this.props.store, this.state.username, this.state.password);
   }

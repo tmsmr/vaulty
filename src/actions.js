@@ -27,10 +27,12 @@ const Actions = {
     return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
       const folders = list
         .filter(key => key.endsWith("/"))
-        .map(item => ({item, folder: true}));
+        .map(item => ({item, folder: true}))
+        .sort();
       const secrets = list
         .filter(key => !key.endsWith("/"))
-        .map(item => ({item, folder: false, value:null}));
+        .map(item => ({item, folder: false, value:null}))
+        .sort();
       store.secrets = folders.concat(secrets);
       store.notify();
     });

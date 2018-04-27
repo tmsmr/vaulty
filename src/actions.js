@@ -7,6 +7,10 @@ const Actions = {
     store.component = component;
     store.notify();
   },
+  err: (store, err) => {
+    store.error = err.toString();
+    store.notify();
+  },
   errReset: (store) => {
     store.error = null;
     store.notify();
@@ -16,46 +20,38 @@ const Actions = {
       store.auth = auth;
       Actions.open(store, "Secrets");
     }).catch(err => {
-      store.error = err.toString();
+      Actions.err(store, err);
+    });
+  },
+  listSecrets: (store, path) => {
+    return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
+      const folders = list
+        .filter(key => key.endsWith("/"))
+        .map(item => ({item, folder: true}));
+      const secrets = list
+        .filter(key => !key.endsWith("/"))
+        .map(item => ({item, folder: false, value:null}));
+      store.secrets = folders.concat(secrets);
       store.notify();
     });
   },
+  fetchSecretValues: (store, path) => {
+    store.secrets.forEach(secret => {
+      if(!secret.folder) {
+        API.get(store.config.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
+          secret.value = secretValue;
+          store.notify();
+        }).catch(err => {
+          Actions.err(store, err);
+        });
+      }
+    });
+  },
   loadSecrets: (store, path) => {
-    API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
-      list = list.keys;
-      list.sort();
-      let secrets = [];
-      for (let i in list) {
-        if (list[i].endsWith("/")) {
-          secrets.push({
-            item: list[i],
-            type: "folder"
-          });
-        } else {
-          secrets.push({
-            item: list[i],
-            type: "secret",
-            secret: null
-          });
-        }
-      }
-      store.secrets = secrets;
-      store.notify();
-    }).then(() => {
-      for (let i in store.secrets) {
-        if (store.secrets[i].type === "secret") {
-          API.get(store.config.endpoint, store.auth.client_token, path + store.secrets[i].item).then(secret => {
-            store.secrets[i].secret = secret.data.value;
-            store.notify();
-          }).catch(err => {
-            store.error = err.toString();
-            store.notify();
-          });
-        }
-      }
+    Actions.listSecrets(store, path).then(() => {
+      Actions.fetchSecretValues(store, path);
     }).catch(err => {
-      store.error = err.toString();
-      store.notify();
+      Actions.err(store, err);
     });
   }
 };
@@ -90,7 +86,7 @@ const API = {
       }
       return Promise.reject("Unable to retrieve list for " + path);
     }).then(body => {
-      return body.data;
+      return body.data.keys;
     });
   },
   get: (endpoint, token, path) => {
@@ -107,7 +103,7 @@ const API = {
       }
       return Promise.reject("Unable to retrieve secret " + path);
     }).then(body => {
-      return body.data;
+      return body.data.data.value;
     });
   }
 };

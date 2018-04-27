@@ -12,13 +12,13 @@ class Secrets extends Component {
     return (
       <div>
         {this.props.store.secrets.map(function(a) {
-          if(a.type === "folder") {
+          if(a.folder) {
             return (
-              <p>{a.item}</p>
+              <p key={a.item}>{a.item}</p>
             );
           }
           return (
-            <p>{a.item}: {a.secret}</p>
+            <p key={a.item}>{a.item}: {a.value}</p>
           );
         })}
       </div>

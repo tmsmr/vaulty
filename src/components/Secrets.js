@@ -2,15 +2,18 @@ import React, {Component} from 'react';
 
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-import Table, {TableBody, TableCell, TableRow} from 'material-ui/Table';
-import Icon from 'material-ui/Icon';
-import grey from 'material-ui/colors/grey';
+import Table, {TableBody} from 'material-ui/Table';
+import Chip from 'material-ui/Chip';
+
+import FolderRow from './FolderRow.js';
+import SecretRow from './SecretRow.js';
 
 import Actions from '../actions.js';
 
 class Secrets extends Component {
   componentDidMount() {
-    Actions.loadSecrets(this.props.store, "/customers/megacompany/");
+    this.props.store.path = ["/"];
+    Actions.loadSecrets(this.props.store, this.props.store.path.join("/"));
   }
 
   render() {
@@ -29,49 +32,29 @@ class Secrets extends Component {
       );
     }
 
-    const folderRowStyle = {
-      backgroundColor: this.props.store.darkTheme ? grey[700] : grey[100]
-    };
-
-    const secretRowStyle = {
-      backgroundColor: this.props.store.darkTheme ? grey[800] : grey[0]
-    };
-
     return (
-      <Paper style={{marginLeft: 10, marginRight: 10, overflowX: 'auto'}}>
-        <Table>
-          <TableBody>
-            {this.props.store.secrets.map(entry => {
-              const icon = entry.folder ? "folder" : "vpn_key";
-              return (
-                <TableRow key={entry.item} style={entry.folder ? folderRowStyle : secretRowStyle}>
-                  <TableCell>
-                    <div style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "flex-start",
-                      alignItems: "center"
-                    }}>
-                      <Icon color="disabled" style={{marginRight: 10}}>{icon}</Icon>
-                      <Typography variant="body2">{entry.item}</Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "flex-start",
-                      alignItems: "center"
-                    }}>
-                      <Typography>{entry.value}</Typography>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </Paper>
+      <div>
+        <div style={{marginLeft: 15, marginRight: 15}}>
+          {this.props.store.path.map((component, i) => {
+            return (<Chip key={i} label={component} style={{marginRight: 10, marginBottom: 5}} onClick={() => {
+              this.props.store.path = this.props.store.path.slice(0,i + 1);
+              Actions.loadSecrets(this.props.store, this.props.store.path.join("/"));
+            }
+            }/>);
+          })}
+        </div>
+        <Paper style={{marginTop: 10, marginLeft: 15, marginRight: 15, overflowX: 'auto'}}>
+          <Table>
+            <TableBody>
+              {this.props.store.secrets.map(entry => {
+                if (entry.folder)
+                  return (<FolderRow key={entry.item} folder={entry} store={this.props.store}/>);
+                return (<SecretRow key={entry.item} secret={entry} store={this.props.store}/>);
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </div>
     );
   }
 }

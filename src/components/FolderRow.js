@@ -14,11 +14,25 @@ const contentWrapStyle = {
   alignItems: "center"
 };
 
+const backgroundColors = {
+  light: {normal: grey[200], hover: grey[300]},
+  dark: {normal: grey[700], hover: grey[600]}
+};
+
 class FolderRow extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {hovering: false};
+  }
+
   render() {
+    console.log(this.state);
+    let bg = this.state.hovering ? (this.props.store.darkTheme ? backgroundColors.dark.hover : backgroundColors.light.hover) : (this.props.store.darkTheme ? backgroundColors.dark.normal : backgroundColors.light.normal);
     return (
       <TableRow
-        style={{backgroundColor: this.props.store.darkTheme ? grey[700] : grey[100]}}
+        style={{backgroundColor: bg, cursor: "pointer"}}
+        onMouseEnter={() => this.setState({hovering: true})}
+        onMouseLeave={() => this.setState({hovering: false})}
         onClick={() => {
           this.props.store.path.push(this.props.folder.item);
           Actions.loadSecrets(this.props.store, this.props.store.path.join("/"));

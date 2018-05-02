@@ -3,9 +3,18 @@ import React, {Component} from 'react';
 import Typography from 'material-ui/Typography';
 import {TableCell, TableRow} from 'material-ui/Table';
 import Icon from 'material-ui/Icon';
+import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import Input from 'material-ui/Input';
 import grey from 'material-ui/colors/grey';
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+
+import Actions from '../actions.js';
 
 const contentWrapStyle = {
   display: "flex",
@@ -25,8 +34,17 @@ class SecretRow extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      passVisible: false
+      passVisible: false,
+      delDialogVisible: false,
+      value: null,
+      modified: false
     };
+  }
+
+  componentDidUpdate() {
+    if (this.state.value == null && this.props.secret.value) {
+      this.setState({value: this.props.secret.value})
+    }
   }
 
   guessType() {
@@ -65,15 +83,24 @@ class SecretRow extends Component {
             <Typography variant="body2">{this.props.secret.item}</Typography>
           </div>
         </TableCell>
-        {this.props.secret.value &&
         <TableCell>
+          {this.state.value != null &&
           <div style={contentWrapStyle}>
+            {this.state.modified &&
+            <IconButton color="inherit">
+              <Icon>save</Icon>
+            </IconButton>
+            }
             <Input
               autoComplete="off"
               id={this.props.secret.item}
               fullWidth
               type={(type === TYPES.PASSWORD && !this.state.passVisible) ? "password" : "text"}
-              value={this.props.secret.value}
+              value={this.state.value}
+              onChange={e => {
+                this.setState({value: e.target.value});
+                this.setState({modified: true});
+              }}
             />
             {type === TYPES.HREF &&
             <a href={this.props.secret.value} target="_blank" style={{color: "inherit", textDecoration: "none"}}>
@@ -94,9 +121,36 @@ class SecretRow extends Component {
             }}>
               <Icon>content_copy</Icon>
             </IconButton>
+            <IconButton color="inherit" onClick={() => {
+              this.setState({delDialogVisible: true});
+            }}>
+              <Icon>delete</Icon>
+            </IconButton>
+            <div>
+              <Dialog
+                open={this.state.delDialogVisible}
+                onClose={() => this.setState({delDialogVisible: false})}
+              >
+                <DialogTitle>Confirmation</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>{"Permanently delete secret " + this.props.store.path.join("") + this.props.secret.item + "?"}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => this.setState({delDialogVisible: false})}>
+                    Cancel
+                  </Button>
+                  <Button color="secondary" onClick={() => {
+                    Actions.deleteSecret(this.props.store, this.props.store.path.join("") + this.props.secret.item, this.props.secret);
+                    this.setState({delDialogVisible: false});
+                  }}>
+                    Delete
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </div>
           </div>
+          }
         </TableCell>
-        }
       </TableRow>
     );
   }

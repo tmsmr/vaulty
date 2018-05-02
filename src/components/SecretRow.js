@@ -51,6 +51,8 @@ class SecretRow extends Component {
       case TYPES.HREF:
         leftIcon = "public";
         break;
+      default:
+        break;
     }
     return (
       <TableRow
@@ -67,6 +69,7 @@ class SecretRow extends Component {
         <TableCell>
           <div style={contentWrapStyle}>
             <Input
+              autoComplete="off"
               id={this.props.secret.item}
               fullWidth
               type={(type === TYPES.PASSWORD && !this.state.passVisible) ? "password" : "text"}

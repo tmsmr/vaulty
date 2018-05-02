@@ -53,7 +53,6 @@ const Actions = {
     });
   },
   loadSecrets: (store, path) => {
-    console.log(path);
     Actions.listSecrets(store, path).then(() => {
       Actions.fetchSecretValues(store, path);
     }).catch(err => {
@@ -110,6 +109,35 @@ const API = {
       return Promise.reject("Unable to retrieve secret " + path);
     }).then(body => {
       return body.data.data.value;
+    });
+  },
+  set: (endpoint, token, path, value) => {
+    return fetch(endpoint + "/v1/secret/data" + path, {
+      headers: {
+        "X-Vault-Token": token
+      },
+      body: JSON.stringify({data: {value: value}}),
+      method: "POST"
+    }).catch(() => {
+      return Promise.reject("Unable to reach Vault endpoint " + endpoint);
+    }).then(response => {
+      if (!response.ok) {
+        return Promise.reject("Unable to set secret " + path);
+      }
+    });
+  },
+  del: (endpoint, token, path) => {
+    return fetch(endpoint + "/v1/secret/metadata" + path, {
+      headers: {
+        "X-Vault-Token": token
+      },
+      method: "DELETE"
+    }).catch(() => {
+      return Promise.reject("Unable to reach Vault endpoint " + endpoint);
+    }).then(response => {
+      if (!response.ok) {
+        return Promise.reject("Unable to delete secret " + path);
+      }
     });
   }
 };

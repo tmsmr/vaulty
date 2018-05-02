@@ -34,8 +34,7 @@ class FolderRow extends Component {
         onMouseEnter={() => this.setState({hovering: true})}
         onMouseLeave={() => this.setState({hovering: false})}
         onClick={() => {
-          this.props.store.path.push(this.props.folder.item);
-          Actions.loadSecrets(this.props.store, this.props.store.path.join("/"));
+          Actions.loadSecrets(this.props.store, this.props.store.path.join("") + this.props.folder.item);
         }}>
         <TableCell>
           <div style={contentWrapStyle}>

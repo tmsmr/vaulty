@@ -34,6 +34,9 @@ const Actions = {
         .map(item => ({item, folder: false, value:null}))
         .sort();
       store.secrets = folders.concat(secrets);
+      let pathelems = [""];
+      pathelems.push(...path.split("/").filter(elem => elem.length > 0));
+      store.path = pathelems.map(elem => elem + "/");
       store.notify();
     });
   },
@@ -50,6 +53,7 @@ const Actions = {
     });
   },
   loadSecrets: (store, path) => {
+    console.log(path);
     Actions.listSecrets(store, path).then(() => {
       Actions.fetchSecretValues(store, path);
     }).catch(err => {

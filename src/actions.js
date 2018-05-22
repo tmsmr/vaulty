@@ -70,7 +70,7 @@ const Actions = {
 const API = {
   fetch: (url, options, error) => {
     return fetch(url, options, error).catch(() => {
-      return Promise.reject("Unable to reach Vault endpoint" + url);
+      return Promise.reject("Unable to reach Vault endpoint " + url);
     }).then(response => {
       if (!response.ok) {
         return Promise.reject(error);

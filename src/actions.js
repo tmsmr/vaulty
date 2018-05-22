@@ -16,24 +16,22 @@ const Actions = {
     store.notify();
   },
   login: (store, username, password) => {
-    API.login(store.config.endpoint, username, password).then(auth => {
+    return API.login(store.config.endpoint, username, password).then(auth => {
       store.auth = auth;
-      Actions.open(store, "Secrets");
       store.notify();
+      Actions.open(store, "Secrets");
     }).catch(err => {
       Actions.err(store, err);
       store.notify();
     });
   },
-  listSecrets: (store, path) => {
+  fetchSecretKeys: (store, path) => {
     return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
-      const folders = list
-        .filter(key => key.endsWith("/"))
+      const folders = list.filter(key => key.endsWith("/"))
         .map(item => ({item, folder: true}))
         .sort();
-      const secrets = list
-        .filter(key => !key.endsWith("/"))
-        .map(item => ({item, folder: false, value:null}))
+      const secrets = list.filter(key => !key.endsWith("/"))
+        .map(item => ({item, folder: false, value: null}))
         .sort();
       store.secrets = folders.concat(secrets);
       let pathelems = [""];
@@ -43,29 +41,24 @@ const Actions = {
     });
   },
   fetchSecretValues: (store, path) => {
-    store.secrets.forEach(secret => {
-      if(!secret.folder) {
-        API.get(store.config.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
-          secret.value = secretValue;
-          store.notify();
-        }).catch(err => {
-          Actions.err(store, err);
-        });
-      }
-    });
+    return Promise.all(store.secrets.filter(elem => !elem.folder).map(secret => {
+      return API.get(store.config.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
+        secret.value = secretValue;
+      })
+    })).then(() => store.notify());
   },
   loadSecrets: (store, path) => {
-    Actions.listSecrets(store, path).then(() => {
-      Actions.fetchSecretValues(store, path);
+    return Actions.fetchSecretKeys(store, path).then(() => {
+      return Actions.fetchSecretValues(store, path);
     }).catch(err => {
       Actions.err(store, err);
     });
   },
   deleteSecret: (store, path, secret) => {
-    API.del(store.config.endpoint, store.auth.client_token, path).then(() => {
+    return API.del(store.config.endpoint, store.auth.client_token, path).then(() => {
       store.secrets.splice(store.secrets.indexOf(secret), 1);
       store.notify();
-      if(store.secrets.length == 0) {
+      if (store.secrets.length == 0) {
         Actions.loadSecrets(store, "/");
       }
     }).catch(err => {

@@ -27,7 +27,7 @@ const Error = (props) => {
       }}
       autoHideDuration={10000}
       onClose={() => Actions.errReset(props.store)}
-      open={props.store.error ? true : false}
+      open={!!props.store.error}
       message={
         <Typography variant="subheading" color="inherit">
           {props.store.error}

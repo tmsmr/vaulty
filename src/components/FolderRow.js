@@ -15,8 +15,8 @@ const contentWrapStyle = {
 };
 
 const backgroundColors = {
-  light: {normal: grey[200], hover: grey[300]},
-  dark: {normal: grey[700], hover: grey[600]}
+  light: {normal: 'white', hover: grey[300]},
+  dark: {normal: grey[800], hover: grey[700]}
 };
 
 class FolderRow extends Component {
@@ -26,11 +26,11 @@ class FolderRow extends Component {
   }
 
   render() {
-    console.log(this.state);
     let bg = this.state.hovering ? (this.props.store.darkTheme ? backgroundColors.dark.hover : backgroundColors.light.hover) : (this.props.store.darkTheme ? backgroundColors.dark.normal : backgroundColors.light.normal);
     return (
       <TableRow
         style={{backgroundColor: bg, cursor: "pointer"}}
+        onMouseOver={() => this.setState({hovering: true})}
         onMouseEnter={() => this.setState({hovering: true})}
         onMouseLeave={() => this.setState({hovering: false})}
         onClick={() => {

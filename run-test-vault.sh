@@ -67,8 +67,8 @@ EOF
 	policies=password-store
 
 # insert some data
-./vault kv put secret/username value=johndoe
-./vault kv put secret/password value=secret123
+./vault kv put secret/test-username value=theusername
+./vault kv put secret/test-password value=thepassword
 ./vault kv put secret/customers/megacompany/website value="http://www.megacompany.com"
 
 GR='\033[0;32m'

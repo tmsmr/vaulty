@@ -58,7 +58,7 @@ const Actions = {
     return API.del(store.config.endpoint, store.auth.client_token, path).then(() => {
       store.secrets.splice(store.secrets.indexOf(secret), 1);
       store.notify();
-      if (store.secrets.length == 0) {
+      if (store.secrets.length === 0) {
         Actions.loadSecrets(store, "/");
       }
     }).catch(err => {

@@ -7,6 +7,7 @@ import Chip from 'material-ui/Chip';
 
 import FolderRow from './FolderRow';
 import SecretRow from './SecretRow';
+import NewSecretDialog from './NewSecretDialog';
 
 import Actions from '../actions';
 
@@ -18,6 +19,13 @@ const tableContentWrapStyle = {
 };
 
 class Secrets extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      newSecretDialogVisible: false
+    };
+  }
+
   componentDidMount() {
     Actions.loadSecrets(this.props.store, "/");
   }
@@ -47,7 +55,19 @@ class Secrets extends Component {
             }
             }/>);
           })}
+          <Chip key={"+"} label={"+"} style={{marginRight: 10, marginBottom: 5}}
+                onClick={() => this.setState({newSecretDialogVisible: true})}/>
         </div>
+        {this.state.newSecretDialogVisible &&
+        <NewSecretDialog path={this.props.store.path.join("")}
+                         onCancel={() => this.setState({newSecretDialogVisible: false})}
+                         onCreate={(path, value) => {
+                           console.log(path);
+                           console.log(value);
+                           this.setState({newSecretDialogVisible: false});
+                         }}
+        />
+        }
         <Paper style={{marginTop: 10, marginLeft: 15, marginRight: 15, overflowX: 'auto'}}>
           <Table>
             <TableBody>

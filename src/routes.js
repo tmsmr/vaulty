@@ -1,5 +1,5 @@
-import Login from './components/Login.js';
-import Secrets from './components/Secrets.js';
+import Login from './components/Login';
+import Secrets from './components/Secrets';
 
 export default {
   Login: Login,

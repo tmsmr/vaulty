@@ -5,10 +5,17 @@ import Typography from 'material-ui/Typography';
 import Table, {TableBody} from 'material-ui/Table';
 import Chip from 'material-ui/Chip';
 
-import FolderRow from './FolderRow.js';
-import SecretRow from './SecretRow.js';
+import FolderRow from './FolderRow';
+import SecretRow from './SecretRow';
 
-import Actions from '../actions.js';
+import Actions from '../actions';
+
+const tableContentWrapStyle = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "flex-start",
+  alignItems: "center"
+};
 
 class Secrets extends Component {
   componentDidMount() {
@@ -36,7 +43,7 @@ class Secrets extends Component {
         <div style={{marginLeft: 15, marginRight: 15}}>
           {this.props.store.path.map((component, i) => {
             return (<Chip key={i} label={component} style={{marginRight: 10, marginBottom: 5}} onClick={() => {
-              Actions.loadSecrets(this.props.store, this.props.store.path.slice(0,i + 1).join(""));
+              Actions.loadSecrets(this.props.store, this.props.store.path.slice(0, i + 1).join(""));
             }
             }/>);
           })}
@@ -58,3 +65,4 @@ class Secrets extends Component {
 }
 
 export default Secrets;
+export {tableContentWrapStyle};

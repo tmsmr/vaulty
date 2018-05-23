@@ -3,11 +3,11 @@ import React, {Component} from 'react';
 import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
 import withWidth from 'material-ui/utils/withWidth';
 
-import Store from './store.js';
-import Routes from './routes.js';
+import Store from './store';
+import Routes from './routes';
 
-import TopBar from './components/TopBar.js';
-import Error from './components/Error.js';
+import TopBar from './components/TopBar';
+import Error from './components/Error';
 
 const lightTheme = createMuiTheme();
 const darkTheme = createMuiTheme({

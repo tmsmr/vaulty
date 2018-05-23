@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Actions from '../actions.js';
+import Actions from '../actions';
 
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';

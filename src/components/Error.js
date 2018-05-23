@@ -13,7 +13,7 @@ const styles = {
   }
 };
 
-const Error = (props) => {
+const Error = props => {
   return (
     <Snackbar
       SnackbarContentProps={{

@@ -5,14 +5,9 @@ import {TableCell, TableRow} from 'material-ui/Table';
 import Icon from 'material-ui/Icon';
 import grey from 'material-ui/colors/grey';
 
-import Actions from '../actions.js';
+import Actions from '../actions';
 
-const contentWrapStyle = {
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "flex-start",
-  alignItems: "center"
-};
+import {tableContentWrapStyle} from './Secrets';
 
 const backgroundColors = {
   light: {normal: 'white', hover: grey[300]},
@@ -37,13 +32,13 @@ class FolderRow extends Component {
           Actions.loadSecrets(this.props.store, this.props.store.path.join("") + this.props.folder.item);
         }}>
         <TableCell>
-          <div style={contentWrapStyle}>
+          <div style={tableContentWrapStyle}>
             <Icon color="disabled" style={{marginRight: 10}}>folder</Icon>
             <Typography variant="body2">{this.props.folder.item}</Typography>
           </div>
         </TableCell>
         <TableCell>
-          <div style={contentWrapStyle}/>
+          <div style={tableContentWrapStyle}/>
         </TableCell>
       </TableRow>
     );

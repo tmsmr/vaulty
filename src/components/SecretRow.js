@@ -61,7 +61,11 @@ class SecretRow extends Component {
           {this.state.inputValue != null &&
           <div style={tableContentWrapStyle}>
             {this.state.inputValueModified &&
-            <IconButton color="inherit">
+            <IconButton color="inherit"
+                        onClick={() => {
+                          Actions.updateSecret(this.props.store, this.props.store.path.join("") + this.props.secret.item, this.props.secret, this.state.inputValue)
+                            .then(() => this.setState({inputValueModified: false}));
+                        }}>
               <Icon>save</Icon>
             </IconButton>
             }
@@ -71,11 +75,11 @@ class SecretRow extends Component {
               fullWidth
               type={(type === SECRET_TYPES.PASSWORD && !this.state.passVisible) ? "password" : "text"}
               value={this.state.inputValue}
-              /*onChange={e => {
+              onChange={e => {
                 this.setState({inputValue: e.target.value});
                 if (e.target.value === this.props.secret.value) this.setState({inputValueModified: false});
                 else this.setState({inputValueModified: true});
-              }}*/
+              }}
             />
             {type === SECRET_TYPES.HREF &&
             <a href={this.state.inputValue} target="_blank" style={{color: "inherit", textDecoration: "none"}}>

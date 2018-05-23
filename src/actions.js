@@ -22,7 +22,6 @@ const Actions = {
       Actions.open(store, "Secrets");
     }).catch(err => {
       Actions.err(store, err);
-      store.notify();
     });
   },
   fetchSecretKeys: (store, path) => {
@@ -63,6 +62,15 @@ const Actions = {
       }
     }).catch(err => {
       Actions.err(store, err);
+    });
+  },
+  updateSecret: (store, path, secret, newValue) => {
+    return API.set(store.config.endpoint, store.auth.client_token, path, newValue).then(() => {
+      secret.value = newValue;
+      store.notify();
+    }).catch(err => {
+      Actions.err(store, err);
+      return Promise.reject(err);
     });
   }
 };

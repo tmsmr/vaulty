@@ -62,8 +62,7 @@ class Secrets extends Component {
         <NewSecretDialog path={this.props.store.path.join("")}
                          onCancel={() => this.setState({newSecretDialogVisible: false})}
                          onCreate={(path, value) => {
-                           console.log(path);
-                           console.log(value);
+                           Actions.addSecret(this.props.store, path, value);
                            this.setState({newSecretDialogVisible: false});
                          }}
         />

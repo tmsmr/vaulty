@@ -72,6 +72,11 @@ const Actions = {
       Actions.err(store, err);
       return Promise.reject(err);
     });
+  },
+  addSecret: (store, path, value) => {
+    return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
+      store.notify();
+    });
   }
 };
 

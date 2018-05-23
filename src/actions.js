@@ -75,7 +75,9 @@ const Actions = {
   },
   addSecret: (store, path, value) => {
     return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
-      store.notify();
+      Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
+    }).catch(err => {
+      Actions.err(store, err);
     });
   }
 };

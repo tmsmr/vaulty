@@ -10,6 +10,7 @@ TEST_PASS=secret123
 
 # create test dir and change into it
 mkdir -p $TEST_WD
+cp setup-ldap-auth.sh $TEST_WD/ || true
 cd $TEST_WD
 
 # save credentials to env file
@@ -79,6 +80,9 @@ EOF
 	password=$TEST_PASS \
 	policies=password-store-ro \
 	ttl=3600
+
+# setup ldap auth via script (if available)
+source ./setup-ldap-auth.sh || true
 
 # insert some data
 ./vault kv put secret/test-username value=theusername

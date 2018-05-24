@@ -15,9 +15,18 @@ const Actions = {
     store.error = null;
     store.notify();
   },
+  autologin: (store) => {
+    let auth = JSON.parse(localStorage.getItem('auth'));
+    if(auth) {
+      store.auth = auth;
+      store.notify();
+      Actions.open(store, "Secrets");
+    }
+  },
   login: (store, username, password) => {
     return API.login(store.config.endpoint, username, password).then(auth => {
       store.auth = auth;
+      localStorage.setItem('auth', JSON.stringify(auth));
       store.notify();
       Actions.open(store, "Secrets");
     }).catch(err => {
@@ -25,9 +34,9 @@ const Actions = {
     });
   },
   logout: (store) => {
-    Actions.open(store, "Login");
+    localStorage.removeItem('auth');
     store.auth = null;
-    store.secrets = null;
+    Actions.open(store, "Login");
   },
   fetchSecretKeys: (store, path) => {
     return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {

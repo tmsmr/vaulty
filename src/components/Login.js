@@ -26,6 +26,10 @@ class Login extends Component {
     Actions.login(this.props.store, this.state.username, this.state.password);
   }
 
+  componentDidMount() {
+    Actions.autologin(this.props.store);
+  }
+
   render() {
     return (
       <Grid container style={{height: "100%"}} justify="center" alignItems="center">

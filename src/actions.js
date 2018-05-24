@@ -6,10 +6,20 @@ const Actions = {
   },
   loadPreferences: (store) => {
     let theme = JSON.parse(localStorage.getItem('darkTheme'));
-    if(theme) {
+    if (theme) {
       store.darkTheme = theme.darkTheme;
       store.notify();
     }
+    let authMethod = JSON.parse(localStorage.getItem('authMethod'));
+    if (authMethod) {
+      store.authMethod = authMethod.method;
+      store.notify();
+    }
+  },
+  setAuthMethod: (store, authMethod) => {
+    store.authMethod = authMethod;
+    localStorage.setItem('authMethod', JSON.stringify({method: store.authMethod}));
+    store.notify();
   },
   open: (store, component) => {
     store.component = component;
@@ -25,7 +35,7 @@ const Actions = {
   },
   autologin: (store) => {
     let auth = JSON.parse(localStorage.getItem('auth'));
-    if(auth) {
+    if (auth) {
       store.auth = auth;
       store.notify();
       Actions.open(store, "Secrets");
@@ -73,7 +83,7 @@ const Actions = {
       return Actions.fetchSecretValues(store, path);
     }).catch(err => {
       Actions.err(store, err.error);
-      if(err.status === 403) Actions.logout(store);
+      if (err.status === 403) Actions.logout(store);
 
     });
   },
@@ -85,7 +95,7 @@ const Actions = {
         Actions.loadSecrets(store, "/");
       }
     }).catch(err => {
-      if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+      if (err.status === 403) Actions.err(store, err.error + " (Forbidden)");
       else Actions.err(store, err.error);
     });
   },
@@ -94,7 +104,7 @@ const Actions = {
       secret.value = newValue;
       store.notify();
     }).catch(err => {
-      if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+      if (err.status === 403) Actions.err(store, err.error + " (Forbidden)");
       else Actions.err(store, err.error);
       return Promise.reject(err.error);
     });
@@ -103,11 +113,11 @@ const Actions = {
     return API.get(store.config.endpoint, store.auth.client_token, path).then(() => {
       Actions.err(store, "Secret " + path + " exists already");
     }).catch(notfound => {
-      if(notfound.status && notfound.status === 404) {
+      if (notfound.status && notfound.status === 404) {
         return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
           Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
         }).catch(err => {
-          if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+          if (err.status === 403) Actions.err(store, err.error + " (Forbidden)");
           else Actions.err(store, err.error);
         });
       } else {

@@ -15,12 +15,12 @@ const AUTH_METHODS = [
 ];
 
 class Login extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       username: '',
       password: '',
-      authMethod: AUTH_METHODS[0]
+      authMethod: AUTH_METHODS.find(method => method.name === this.props.store.authMethod)
     }
   }
 
@@ -49,7 +49,8 @@ class Login extends Component {
                   style={{width: '100%'}}
                   value={this.state.authMethod.name}
                   onChange={e => {
-                    this.setState({authMethod: AUTH_METHODS.find(method => method.name === e.target.value)})
+                    this.setState({authMethod: AUTH_METHODS.find(method => method.name === e.target.value)});
+                    Actions.setAuthMethod(this.props.store, e.target.value);
                   }}
                 >
                   {AUTH_METHODS.map(method => {

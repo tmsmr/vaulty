@@ -172,7 +172,7 @@ const API = {
     });
   },
   list: (endpoint, token, path) => {
-    return API.fetchJSON(endpoint + "/v1/secret/metadata" + path, {
+    return API.fetchJSON(endpoint + "/v1/vaulty/metadata" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -182,7 +182,7 @@ const API = {
     });
   },
   get: (endpoint, token, path) => {
-    return API.fetchJSON(endpoint + "/v1/secret/data" + path, {
+    return API.fetchJSON(endpoint + "/v1/vaulty/data" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -192,7 +192,7 @@ const API = {
     });
   },
   set: (endpoint, token, path, value) => {
-    return API.fetch(endpoint + "/v1/secret/data" + path, {
+    return API.fetch(endpoint + "/v1/vaulty/data" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -201,7 +201,7 @@ const API = {
     }, "Unable to set secret " + path);
   },
   del: (endpoint, token, path) => {
-    return API.fetch(endpoint + "/v1/secret/metadata" + path, {
+    return API.fetch(endpoint + "/v1/vaulty/metadata" + path, {
       headers: {
         "X-Vault-Token": token
       },

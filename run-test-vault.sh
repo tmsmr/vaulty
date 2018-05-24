@@ -44,6 +44,9 @@ echo "export VAULT_ADDR=$VAULT_ADDR" >> vault.env
 # login
 ./vault login token=$ROOT_TOKEN
 
+# create a kv engine for vaulty
+./vault secrets enable -version=2 -path=vaulty kv
+
 # set cors policy
 ./vault write sys/config/cors -<<EOF
 {
@@ -54,14 +57,14 @@ EOF
 
 # create policy for password rw operations
 ./vault policy write password-store-rw -<<EOF
-path "secret/*" {
+path "vaulty/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOF
 
 # create policy for password ro operations
 ./vault policy write password-store-ro -<<EOF
-path "secret/*" {
+path "vaulty/*" {
   capabilities = ["read", "list"]
 }
 EOF
@@ -85,9 +88,9 @@ EOF
 source ./setup-ldap-auth.sh || true
 
 # insert some data
-./vault kv put secret/test-username value=theusername
-./vault kv put secret/test-password value=thepassword
-./vault kv put secret/customers/github/website value="http://www.github.com"
+./vault kv put vaulty/test-username value=theusername
+./vault kv put vaulty/test-password value=thepassword
+./vault kv put vaulty/customers/github/website value="http://www.github.com"
 
 GR='\033[0;32m'
 NC='\033[0m'

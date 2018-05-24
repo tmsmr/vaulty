@@ -73,6 +73,9 @@ const Actions = {
       return Actions.fetchSecretValues(store, path);
     }).catch(err => {
       Actions.err(store, err.error);
+      if(err.status === 403) {
+        Actions.logout(store);
+      }
     });
   },
   deleteSecret: (store, path, secret) => {

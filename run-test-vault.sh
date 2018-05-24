@@ -64,7 +64,8 @@ EOF
 # create test user with password-store policy
 ./vault write auth/userpass/users/$TEST_USER \
 	password=$TEST_PASS \
-	policies=password-store
+	policies=password-store \
+	ttl=120
 
 # insert some data
 ./vault kv put secret/test-username value=theusername

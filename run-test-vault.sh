@@ -56,32 +56,60 @@ echo "export VAULT_ADDR=$VAULT_ADDR" >> vault.env
 EOF
 
 # create policy for password rw operations
-./vault policy write password-store-rw -<<EOF
-path "vaulty/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+./vault policy write vaulty-rw -<<EOF
+path "vaulty/metadata/*" {
+  capabilities = ["delete", "list"]
+}
+path "vaulty/data/*" {
+  capabilities = ["create", "read", "update"]
 }
 EOF
 
 # create policy for password ro operations
-./vault policy write password-store-ro -<<EOF
-path "vaulty/*" {
-  capabilities = ["read", "list"]
+./vault policy write vaulty-ro -<<EOF
+path "vaulty/metadata/*" {
+  capabilities = ["list"]
+}
+path "vaulty/data/*" {
+  capabilities = ["read"]
+}
+EOF
+
+# create policy for password ro operations (without access on customers subfolder)
+./vault policy write vaulty-no-customers -<<EOF
+path "vaulty/metadata/*" {
+  capabilities = ["list"]
+}
+path "vaulty/data/*" {
+  capabilities = ["read"]
+}
+path "vaulty/metadata/customers/*" {
+  capabilities = ["deny"]
+}
+path "vaulty/data/customers/*" {
+  capabilities = ["deny"]
 }
 EOF
 
 # enable user/pass authentication
 ./vault auth enable userpass
 
-# create test user with password-store-rw policy
+# create test user with vaulty-rw policy
 ./vault write auth/userpass/users/$TEST_USER \
 	password=$TEST_PASS \
-	policies=password-store-rw \
+	policies=vaulty-rw \
 	ttl=3600
 
-# create test user with password-store-ro policy
+# create test user with vaulty-ro policy
 ./vault write auth/userpass/users/$TEST_USER-ro \
 	password=$TEST_PASS \
-	policies=password-store-ro \
+	policies=vaulty-ro \
+	ttl=3600
+
+# create test user with vaulty-no-customers policy
+./vault write auth/userpass/users/$TEST_USER-no-customers \
+	password=$TEST_PASS \
+	policies=vaulty-no-customers \
 	ttl=3600
 
 # setup ldap auth via script (if available)

@@ -9,7 +9,7 @@ import { Dialog,
 } from '@material-ui/core';
 
 function validatePath(path) {
-  return !!/^\/[\w/-]+$/.exec(path);
+  return !!/^\/[\w/-]*[\w-]+$/.exec(path);
 }
 
 class NewSecretDialog extends Component {

@@ -8,12 +8,17 @@ import Dialog, {
   DialogActions
 } from 'material-ui/Dialog';
 
+function validatePath(path) {
+  return !!/^\/[\w/-]+$/.exec(path);
+}
+
 class NewSecretDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
       path: props.path,
-      value: ""
+      value: "",
+      valid: false
     };
   }
 
@@ -28,7 +33,10 @@ class NewSecretDialog extends Component {
             label="Path"
             fullWidth
             value={this.state.path}
-            onChange={e => this.setState({path: e.target.value})}
+            onChange={e => {
+              this.setState({path: e.target.value});
+              this.setState({valid: validatePath(e.target.value)});
+            }}
           />
           <TextField
             id="value"
@@ -43,7 +51,7 @@ class NewSecretDialog extends Component {
           <Button onClick={this.props.onCancel}>
             Cancel
           </Button>
-          <Button onClick={() => this.props.onCreate(this.state.path, this.state.value)}>
+          <Button disabled={!this.state.valid} onClick={() => this.props.onCreate(this.state.path, this.state.value)}>
             Create
           </Button>
         </DialogActions>

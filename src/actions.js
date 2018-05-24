@@ -21,7 +21,7 @@ const Actions = {
       store.notify();
       Actions.open(store, "Secrets");
     }).catch(err => {
-      Actions.err(store, err);
+      Actions.err(store, err.error);
     });
   },
   fetchSecretKeys: (store, path) => {
@@ -50,7 +50,7 @@ const Actions = {
     return Actions.fetchSecretKeys(store, path).then(() => {
       return Actions.fetchSecretValues(store, path);
     }).catch(err => {
-      Actions.err(store, err);
+      Actions.err(store, err.error);
     });
   },
   deleteSecret: (store, path, secret) => {
@@ -61,7 +61,7 @@ const Actions = {
         Actions.loadSecrets(store, "/");
       }
     }).catch(err => {
-      Actions.err(store, err);
+      Actions.err(store, err.error);
     });
   },
   updateSecret: (store, path, secret, newValue) => {
@@ -69,15 +69,23 @@ const Actions = {
       secret.value = newValue;
       store.notify();
     }).catch(err => {
-      Actions.err(store, err);
-      return Promise.reject(err);
+      Actions.err(store, err.error);
+      return Promise.reject(err.error);
     });
   },
   addSecret: (store, path, value) => {
-    return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
-      Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
-    }).catch(err => {
-      Actions.err(store, err);
+    return API.get(store.config.endpoint, store.auth.client_token, path).then(() => {
+      Actions.err(store, "Secret " + path + " exists already");
+    }).catch(notfound => {
+      if(notfound.status && notfound.status === 404) {
+        return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
+          Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
+        }).catch(err => {
+          Actions.err(store, err.error);
+        });
+      } else {
+        Actions.err(store, notfound.error);
+      }
     });
   }
 };
@@ -85,10 +93,10 @@ const Actions = {
 const API = {
   fetch: (url, options, error) => {
     return fetch(url, options, error).catch(() => {
-      return Promise.reject("Unable to reach " + url);
+      return Promise.reject({error: "Unable to reach " + url, status: null});
     }).then(response => {
       if (!response.ok) {
-        return Promise.reject(error);
+        return Promise.reject({error: error, status: response.status});
       }
       return response;
     });

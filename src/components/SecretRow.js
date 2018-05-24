@@ -40,8 +40,8 @@ class SecretRow extends Component {
   }
 
   componentDidUpdate() {
-    if (this.state.inputValue == null && this.props.secret.value) {
-      this.setState({inputValue: this.props.secret.value})
+    if (this.state.inputValue == null && this.props.secret.value != null) {
+      this.setState({inputValue: this.props.secret.value});
     }
   }
 

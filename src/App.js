@@ -28,9 +28,9 @@ class App extends Component {
     this.state.store.subscribe(s => {
       this.setState({store: s});
     });
-    this.state.store.subscribe(s => {
+    /*this.state.store.subscribe(s => {
       console.log(s);
-    });
+    });*/
   }
 
   render() {

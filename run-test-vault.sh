@@ -83,6 +83,12 @@ path "vaulty/metadata/*" {
 path "vaulty/data/*" {
   capabilities = ["read"]
 }
+path "vaulty/data/customers/" {
+  capabilities = ["deny"]
+}
+path "vaulty/metadata/customers/" {
+  capabilities = ["deny"]
+}
 path "vaulty/metadata/customers/*" {
   capabilities = ["deny"]
 }

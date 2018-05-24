@@ -20,7 +20,8 @@ class Login extends Component {
     this.state = {
       username: '',
       password: '',
-      authMethod: AUTH_METHODS.find(method => method.name === this.props.store.authMethod)
+      authMethod: AUTH_METHODS.find(method => method.name === this.props.store.authMethod),
+      endpoint: this.props.store.endpoint
     }
   }
 
@@ -57,6 +58,18 @@ class Login extends Component {
                     return (<MenuItem value={method.name} key={method.name}>{method.display}</MenuItem>);
                   })};
                 </Select>
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="endpoint"
+                  label="Vault endpoint"
+                  margin="normal"
+                  value={this.state.endpoint}
+                  onChange={e => {
+                    this.setState({endpoint: e.target.value});
+                    Actions.setVaultEndpoint(this.props.store, e.target.value);
+                  }}
+                />
               </Grid>
               <Grid item>
                 <TextField

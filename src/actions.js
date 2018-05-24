@@ -15,10 +15,20 @@ const Actions = {
       store.authMethod = authMethod.method;
       store.notify();
     }
+    let vaultEndpoint = JSON.parse(localStorage.getItem('endpoint'));
+    if (vaultEndpoint) {
+      store.endpoint = vaultEndpoint.vault;
+      store.notify();
+    }
   },
   setAuthMethod: (store, authMethod) => {
     store.authMethod = authMethod;
     localStorage.setItem('authMethod', JSON.stringify({method: store.authMethod}));
+    store.notify();
+  },
+  setVaultEndpoint: (store, vaultEndpoint) => {
+    store.endpoint = vaultEndpoint;
+    localStorage.setItem('endpoint', JSON.stringify({vault: store.endpoint}));
     store.notify();
   },
   open: (store, component) => {
@@ -42,7 +52,7 @@ const Actions = {
     }
   },
   loginUserPass: (store, username, password) => {
-    return API.login(store.config.endpoint, username, password, 'userpass').then(auth => {
+    return API.login(store.endpoint, username, password, 'userpass').then(auth => {
       store.auth = auth;
       localStorage.setItem('auth', JSON.stringify(auth));
       store.notify();
@@ -52,7 +62,7 @@ const Actions = {
     });
   },
   loginLDAP: (store, username, password) => {
-    return API.login(store.config.endpoint, username, password, 'ldap').then(auth => {
+    return API.login(store.endpoint, username, password, 'ldap').then(auth => {
       store.auth = auth;
       localStorage.setItem('auth', JSON.stringify(auth));
       store.notify();
@@ -67,7 +77,7 @@ const Actions = {
     Actions.open(store, "Login");
   },
   fetchSecretKeys: (store, path) => {
-    return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
+    return API.list(store.endpoint, store.auth.client_token, path).then(list => {
       const folders = list.filter(key => key.endsWith("/"))
         .map(item => ({item, folder: true}))
         .sort();
@@ -83,7 +93,7 @@ const Actions = {
   },
   fetchSecretValues: (store, path) => {
     return Promise.all(store.secrets.filter(elem => !elem.folder).map(secret => {
-      return API.get(store.config.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
+      return API.get(store.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
         secret.value = secretValue;
       })
     })).then(() => store.notify());
@@ -98,7 +108,7 @@ const Actions = {
     });
   },
   deleteSecret: (store, path, secret) => {
-    return API.del(store.config.endpoint, store.auth.client_token, path).then(() => {
+    return API.del(store.endpoint, store.auth.client_token, path).then(() => {
       store.secrets.splice(store.secrets.indexOf(secret), 1);
       store.notify();
       if (store.secrets.length === 0) {
@@ -110,7 +120,7 @@ const Actions = {
     });
   },
   updateSecret: (store, path, secret, newValue) => {
-    return API.set(store.config.endpoint, store.auth.client_token, path, newValue).then(() => {
+    return API.set(store.endpoint, store.auth.client_token, path, newValue).then(() => {
       secret.value = newValue;
       store.notify();
     }).catch(err => {
@@ -120,11 +130,11 @@ const Actions = {
     });
   },
   addSecret: (store, path, value) => {
-    return API.get(store.config.endpoint, store.auth.client_token, path).then(() => {
+    return API.get(store.endpoint, store.auth.client_token, path).then(() => {
       Actions.err(store, "Secret " + path + " exists already");
     }).catch(notfound => {
       if (notfound.status && notfound.status === 404) {
-        return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
+        return API.set(store.endpoint, store.auth.client_token, path, value).then(() => {
           Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
         }).catch(err => {
           if (err.status === 403) Actions.err(store, err.error + " (Forbidden)");

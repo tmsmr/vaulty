@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles';
-import withWidth from 'material-ui/utils/withWidth';
+import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
+import withWidth from '@material-ui/core/withWidth';
 
 import Store from './store';
 import Routes from './routes';

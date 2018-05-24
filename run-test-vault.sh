@@ -3,7 +3,7 @@
 set -e
 
 TEST_WD=/tmp/vault-test
-VAULT_URL=https://releases.hashicorp.com/vault/0.10.0/vault_0.10.0_linux_amd64.zip
+VAULT_URL=https://releases.hashicorp.com/vault/0.10.1/vault_0.10.1_linux_amd64.zip
 
 TEST_USER=johndoe
 TEST_PASS=secret123
@@ -51,26 +51,46 @@ echo "export VAULT_ADDR=$VAULT_ADDR" >> vault.env
 }
 EOF
 
-# create policy for password operations
-./vault policy write password-store -<<EOF
+# create policy for password ro operations
+./vault policy write password-store-rw -<<EOF
 path "secret/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
+}
+EOF
+
+# create policy for password operations
+./vault policy write password-store-ro -<<EOF
+path "secret/*" {
+  capabilities = ["read", "list"]
+}
+path "secret/supersecret" {
+  capabilities = ["deny"]
+}
+path "secret/supersecret/*" {
+  capabilities = ["deny"]
 }
 EOF
 
 # enable user/pass authentication
 ./vault auth enable userpass
 
-# create test user with password-store policy
+# create test user with password-store-rw policy
 ./vault write auth/userpass/users/$TEST_USER \
 	password=$TEST_PASS \
-	policies=password-store \
-	ttl=120
+	policies=password-store-rw \
+	ttl=3600
+
+# create test user with password-store-ro policy
+./vault write auth/userpass/users/$TEST_USER-ro \
+	password=$TEST_PASS \
+	policies=password-store-ro \
+	ttl=3600
 
 # insert some data
 ./vault kv put secret/test-username value=theusername
 ./vault kv put secret/test-password value=thepassword
 ./vault kv put secret/customers/megacompany/website value="http://www.megacompany.com"
+./vault kv put secret/supersecret/admin-password value=ilikebigbutts
 
 GR='\033[0;32m'
 NC='\033[0m'

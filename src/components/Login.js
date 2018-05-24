@@ -1,18 +1,26 @@
 import React, {Component} from 'react';
 
-import Grid from 'material-ui/Grid';
-import Paper from 'material-ui/Paper';
-import TextField from 'material-ui/TextField';
-import Button from 'material-ui/Button';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import Actions from '../actions';
+
+const AUTH_METHODS = [
+  {name: 'userpass', display: 'User/Password'},
+  {name: 'ldap', display: 'LDAP'}
+];
 
 class Login extends Component {
   constructor() {
     super();
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      authMethod: AUTH_METHODS[0]
     }
   }
 
@@ -34,8 +42,21 @@ class Login extends Component {
     return (
       <Grid container style={{height: "100%"}} justify="center" alignItems="center">
         <Grid item>
-          <Paper style={{padding: 50}}>
+          <Paper style={{padding: 40}}>
             <Grid container direction="column">
+              <Grid item>
+                <Select
+                  style={{width: '100%'}}
+                  value={this.state.authMethod.name}
+                  onChange={e => {
+                    this.setState({authMethod: AUTH_METHODS.find(method => method.name === e.target.value)})
+                  }}
+                >
+                  {AUTH_METHODS.map(method => {
+                    return (<MenuItem value={method.name} key={method.name}>{method.display}</MenuItem>);
+                  })};
+                </Select>
+              </Grid>
               <Grid item>
                 <TextField
                   id="username"
@@ -57,7 +78,7 @@ class Login extends Component {
               </Grid>
               <Grid item>
                 <Button
-                  style={{width: '100%', marginTop: 25}}
+                  style={{width: '100%', marginTop: 30}}
                   onClick={() => this.login()}
                 >
                   Login

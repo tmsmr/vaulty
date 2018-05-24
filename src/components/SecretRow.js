@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 
-import Typography from 'material-ui/Typography';
-import {TableCell, TableRow} from 'material-ui/Table';
-import Icon from 'material-ui/Icon';
-import IconButton from 'material-ui/IconButton';
-import Input from 'material-ui/Input';
-import grey from 'material-ui/colors/grey';
+import Typography from '@material-ui/core/Typography';
+import {TableCell, TableRow} from '@material-ui/core';
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
+import grey from '@material-ui/core/colors/grey';
 
 import Actions from '../actions';
 

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 
-import Paper from 'material-ui/Paper';
-import Typography from 'material-ui/Typography';
-import Table, {TableBody} from 'material-ui/Table';
-import Chip from 'material-ui/Chip';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import {Table, TableBody} from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 
 import FolderRow from './FolderRow';
 import SecretRow from './SecretRow';

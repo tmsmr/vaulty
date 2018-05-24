@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 
-import Button from 'material-ui/Button';
-import TextField from 'material-ui/TextField';
-import Dialog, {
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import { Dialog,
   DialogTitle,
   DialogContent,
   DialogActions
-} from 'material-ui/Dialog';
+} from '@material-ui/core';
 
 function validatePath(path) {
   return !!/^\/[\w/-]+$/.exec(path);

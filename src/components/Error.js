@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {withStyles} from 'material-ui/styles';
-import Snackbar from 'material-ui/Snackbar';
-import Typography from 'material-ui/Typography';
-import red from 'material-ui/colors/red';
+import {withStyles} from '@material-ui/core/styles';
+import Snackbar from '@material-ui/core/Snackbar';
+import Typography from '@material-ui/core/Typography';
+import red from '@material-ui/core/colors/red';
 
 import Actions from '../actions';
 
@@ -16,7 +16,7 @@ const styles = {
 const Error = props => {
   return (
     <Snackbar
-      SnackbarContentProps={{
+      ContentProps={{
         classes: {
           root: props.classes.snackbar
         }

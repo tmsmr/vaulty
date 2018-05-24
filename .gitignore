@@ -22,3 +22,5 @@ package-lock.json
 yarn.lock
 
 .idea/
+
+setup-ldap-auth.sh

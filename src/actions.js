@@ -73,9 +73,8 @@ const Actions = {
       return Actions.fetchSecretValues(store, path);
     }).catch(err => {
       Actions.err(store, err.error);
-      if(err.status === 403) {
-        Actions.logout(store);
-      }
+      if(err.status === 403) Actions.logout(store);
+
     });
   },
   deleteSecret: (store, path, secret) => {
@@ -86,7 +85,8 @@ const Actions = {
         Actions.loadSecrets(store, "/");
       }
     }).catch(err => {
-      Actions.err(store, err.error);
+      if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+      else Actions.err(store, err.error);
     });
   },
   updateSecret: (store, path, secret, newValue) => {
@@ -94,7 +94,8 @@ const Actions = {
       secret.value = newValue;
       store.notify();
     }).catch(err => {
-      Actions.err(store, err.error);
+      if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+      else Actions.err(store, err.error);
       return Promise.reject(err.error);
     });
   },
@@ -106,7 +107,8 @@ const Actions = {
         return API.set(store.config.endpoint, store.auth.client_token, path, value).then(() => {
           Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
         }).catch(err => {
-          Actions.err(store, err.error);
+          if(err.status === 403) Actions.err(store, err.error + " (Forbidden)");
+          else Actions.err(store, err.error);
         });
       } else {
         Actions.err(store, notfound.error);

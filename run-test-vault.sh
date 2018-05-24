@@ -51,23 +51,17 @@ echo "export VAULT_ADDR=$VAULT_ADDR" >> vault.env
 }
 EOF
 
-# create policy for password ro operations
+# create policy for password rw operations
 ./vault policy write password-store-rw -<<EOF
 path "secret/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOF
 
-# create policy for password operations
+# create policy for password ro operations
 ./vault policy write password-store-ro -<<EOF
 path "secret/*" {
   capabilities = ["read", "list"]
-}
-path "secret/supersecret" {
-  capabilities = ["deny"]
-}
-path "secret/supersecret/*" {
-  capabilities = ["deny"]
 }
 EOF
 
@@ -89,8 +83,7 @@ EOF
 # insert some data
 ./vault kv put secret/test-username value=theusername
 ./vault kv put secret/test-password value=thepassword
-./vault kv put secret/customers/megacompany/website value="http://www.megacompany.com"
-./vault kv put secret/supersecret/admin-password value=ilikebigbutts
+./vault kv put secret/customers/github/website value="http://www.github.com"
 
 GR='\033[0;32m'
 NC='\033[0m'

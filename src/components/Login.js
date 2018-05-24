@@ -10,8 +10,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Actions from '../actions';
 
 const AUTH_METHODS = [
-  {name: 'userpass', display: 'User/Password'},
-  {name: 'ldap', display: 'LDAP'}
+  {name: 'userpass', display: 'User/Password', loginFunc: (store, username, password) => Actions.loginUserPass(store, username, password)},
+  {name: 'ldap', display: 'LDAP', loginFunc: (store, username, password) => Actions.loginLDAP(store, username, password)}
 ];
 
 class Login extends Component {
@@ -31,7 +31,7 @@ class Login extends Component {
   }
 
   login() {
-    Actions.login(this.props.store, this.state.username, this.state.password);
+    this.state.authMethod.loginFunc(this.props.store, this.state.username, this.state.password);
   }
 
   componentDidMount() {

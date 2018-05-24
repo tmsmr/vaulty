@@ -38,15 +38,25 @@ const Actions = {
     if (auth) {
       store.auth = auth;
       store.notify();
-      Actions.open(store, "Secrets");
+      Actions.open(store, 'Secrets');
     }
   },
-  login: (store, username, password) => {
-    return API.login(store.config.endpoint, username, password).then(auth => {
+  loginUserPass: (store, username, password) => {
+    return API.login(store.config.endpoint, username, password, 'userpass').then(auth => {
       store.auth = auth;
       localStorage.setItem('auth', JSON.stringify(auth));
       store.notify();
-      Actions.open(store, "Secrets");
+      Actions.open(store, 'Secrets');
+    }).catch(err => {
+      Actions.err(store, err.error);
+    });
+  },
+  loginLDAP: (store, username, password) => {
+    return API.login(store.config.endpoint, username, password, 'ldap').then(auth => {
+      store.auth = auth;
+      localStorage.setItem('auth', JSON.stringify(auth));
+      store.notify();
+      Actions.open(store, 'Secrets');
     }).catch(err => {
       Actions.err(store, err.error);
     });
@@ -143,8 +153,8 @@ const API = {
       return response.json();
     });
   },
-  login: (endpoint, username, password) => {
-    return API.fetchJSON(endpoint + "/v1/auth/userpass/login/" + username, {
+  login: (endpoint, username, password, method) => {
+    return API.fetchJSON(endpoint + "/v1/auth/" + method + "/login/" + username, {
       body: JSON.stringify({password: password}),
       method: "POST"
     }, "Invalid Vault login").then(body => {

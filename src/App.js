@@ -9,6 +9,8 @@ import Routes from './routes';
 import TopBar from './components/TopBar';
 import Error from './components/Error';
 
+import Actions from './actions';
+
 const lightTheme = createMuiTheme();
 const darkTheme = createMuiTheme({
   palette: {
@@ -28,9 +30,13 @@ class App extends Component {
     this.state.store.subscribe(s => {
       this.setState({store: s});
     });
-    this.state.store.subscribe(s => {
+    /*this.state.store.subscribe(s => {
       console.log(s);
-    });
+    });*/
+  }
+
+  componentDidMount() {
+    Actions.loadPreferences(this.state.store);
   }
 
   render() {

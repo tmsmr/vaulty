@@ -1,7 +1,15 @@
 const Actions = {
   themeToggle: (store) => {
     store.darkTheme = !store.darkTheme;
+    localStorage.setItem('darkTheme', JSON.stringify({darkTheme: store.darkTheme}));
     store.notify();
+  },
+  loadPreferences: (store) => {
+    let theme = JSON.parse(localStorage.getItem('darkTheme'));
+    if(theme) {
+      store.darkTheme = theme.darkTheme;
+      store.notify();
+    }
   },
   open: (store, component) => {
     store.component = component;

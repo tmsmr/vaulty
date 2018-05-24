@@ -24,6 +24,11 @@ const Actions = {
       Actions.err(store, err.error);
     });
   },
+  logout: (store) => {
+    Actions.open(store, "Login");
+    store.auth = null;
+    store.secrets = null;
+  },
   fetchSecretKeys: (store, path) => {
     return API.list(store.config.endpoint, store.auth.client_token, path).then(list => {
       const folders = list.filter(key => key.endsWith("/"))

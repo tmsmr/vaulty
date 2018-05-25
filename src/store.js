@@ -1,6 +1,7 @@
 const Store = () => {
   return {
     endpoint: "http://127.0.0.1:8200",
+    mount: "vaulty-default",
     darkTheme: false,
     authMethod: "userpass",
     component: "Login",

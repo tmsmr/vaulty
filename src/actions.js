@@ -20,6 +20,11 @@ const Actions = {
       store.endpoint = vaultEndpoint.vault;
       store.notify();
     }
+    let vaultMount = JSON.parse(localStorage.getItem('mount'));
+    if (vaultMount) {
+      store.mount = vaultMount.mount;
+      store.notify();
+    }
   },
   setAuthMethod: (store, authMethod) => {
     store.authMethod = authMethod;
@@ -29,6 +34,11 @@ const Actions = {
   setVaultEndpoint: (store, vaultEndpoint) => {
     store.endpoint = vaultEndpoint;
     localStorage.setItem('endpoint', JSON.stringify({vault: store.endpoint}));
+    store.notify();
+  },
+  setVaultMount: (store, vaultMount) => {
+    store.mount = vaultMount;
+    localStorage.setItem('mount', JSON.stringify({mount: store.mount}));
     store.notify();
   },
   open: (store, component) => {
@@ -77,7 +87,7 @@ const Actions = {
     Actions.open(store, "Login");
   },
   fetchSecretKeys: (store, path) => {
-    return API.list(store.endpoint, store.auth.client_token, path).then(list => {
+    return API.list(store.endpoint, store.mount, store.auth.client_token, path).then(list => {
       const folders = list.filter(key => key.endsWith("/"))
         .map(item => ({item, folder: true}))
         .sort();
@@ -93,7 +103,7 @@ const Actions = {
   },
   fetchSecretValues: (store, path) => {
     return Promise.all(store.secrets.filter(elem => !elem.folder).map(secret => {
-      return API.get(store.endpoint, store.auth.client_token, path + secret.item).then(secretValue => {
+      return API.get(store.endpoint, store.mount, store.auth.client_token, path + secret.item).then(secretValue => {
         secret.value = secretValue;
       })
     })).then(() => store.notify());
@@ -108,7 +118,7 @@ const Actions = {
     });
   },
   deleteSecret: (store, path, secret) => {
-    return API.del(store.endpoint, store.auth.client_token, path).then(() => {
+    return API.del(store.endpoint, store.mount, store.auth.client_token, path).then(() => {
       store.secrets.splice(store.secrets.indexOf(secret), 1);
       store.notify();
       if (store.secrets.length === 0) {
@@ -120,7 +130,7 @@ const Actions = {
     });
   },
   updateSecret: (store, path, secret, newValue) => {
-    return API.set(store.endpoint, store.auth.client_token, path, newValue).then(() => {
+    return API.set(store.endpoint, store.mount, store.auth.client_token, path, newValue).then(() => {
       secret.value = newValue;
       store.notify();
     }).catch(err => {
@@ -130,11 +140,11 @@ const Actions = {
     });
   },
   addSecret: (store, path, value) => {
-    return API.get(store.endpoint, store.auth.client_token, path).then(() => {
+    return API.get(store.endpoint, store.mount, store.auth.client_token, path).then(() => {
       Actions.err(store, "Secret " + path + " exists already");
     }).catch(notfound => {
       if (notfound.status && notfound.status === 404) {
-        return API.set(store.endpoint, store.auth.client_token, path, value).then(() => {
+        return API.set(store.endpoint, store.mount, store.auth.client_token, path, value).then(() => {
           Actions.loadSecrets(store, path.substr(0, path.lastIndexOf("/") + 1));
         }).catch(err => {
           if (err.status === 403) Actions.err(store, err.error + " (Forbidden)");
@@ -171,8 +181,8 @@ const API = {
       return body.auth;
     });
   },
-  list: (endpoint, token, path) => {
-    return API.fetchJSON(endpoint + "/v1/vaulty/metadata" + path, {
+  list: (endpoint, mount, token, path) => {
+    return API.fetchJSON(endpoint + "/v1/" + mount + "/metadata" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -181,8 +191,8 @@ const API = {
       return body.data.keys;
     });
   },
-  get: (endpoint, token, path) => {
-    return API.fetchJSON(endpoint + "/v1/vaulty/data" + path, {
+  get: (endpoint, mount, token, path) => {
+    return API.fetchJSON(endpoint + "/v1/" + mount + "/data" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -191,8 +201,8 @@ const API = {
       return body.data.data.value;
     });
   },
-  set: (endpoint, token, path, value) => {
-    return API.fetch(endpoint + "/v1/vaulty/data" + path, {
+  set: (endpoint, mount, token, path, value) => {
+    return API.fetch(endpoint + "/v1/" + mount + "/data" + path, {
       headers: {
         "X-Vault-Token": token
       },
@@ -200,8 +210,8 @@ const API = {
       method: "POST"
     }, "Unable to set secret " + path);
   },
-  del: (endpoint, token, path) => {
-    return API.fetch(endpoint + "/v1/vaulty/metadata" + path, {
+  del: (endpoint, mount, token, path) => {
+    return API.fetch(endpoint + "/v1/" + mount + "/metadata" + path, {
       headers: {
         "X-Vault-Token": token
       },

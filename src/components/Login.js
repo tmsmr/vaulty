@@ -21,7 +21,8 @@ class Login extends Component {
       username: '',
       password: '',
       authMethod: AUTH_METHODS.find(method => method.name === this.props.store.authMethod),
-      endpoint: this.props.store.endpoint
+      endpoint: this.props.store.endpoint,
+      mount:this.props.store.mount
     }
   }
 
@@ -68,6 +69,18 @@ class Login extends Component {
                   onChange={e => {
                     this.setState({endpoint: e.target.value});
                     Actions.setVaultEndpoint(this.props.store, e.target.value);
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="mount"
+                  label="Vault mount"
+                  margin="normal"
+                  value={this.state.mount}
+                  onChange={e => {
+                    this.setState({mount: e.target.value});
+                    Actions.setVaultMount(this.props.store, e.target.value);
                   }}
                 />
               </Grid>

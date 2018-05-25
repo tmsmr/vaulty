@@ -10,7 +10,7 @@ TEST_PASS=secret123
 
 # create test dir and change into it
 mkdir -p $TEST_WD
-cp setup-ldap-auth.sh $TEST_WD/ || true
+# cp setup-ldap-auth.sh $TEST_WD/ || true
 cd $TEST_WD
 
 # save credentials to env file
@@ -30,7 +30,7 @@ killall vault &> /dev/null || true
 ./vault server -dev &> vault.log &
 
 # wait a bit
-sleep 5
+sleep 2
 
 # extract root token from log output
 ROOT_TOKEN=`grep "Root Token:" vault.log | cut -d " " -f 3`
@@ -45,7 +45,8 @@ echo "export VAULT_ADDR=$VAULT_ADDR" >> vault.env
 ./vault login token=$ROOT_TOKEN
 
 # create a kv engine for vaulty
-./vault secrets enable -version=2 -path=vaulty kv
+./vault secrets enable -version=2 -path=vaulty-default kv
+./vault secrets enable -version=2 -path=vaulty-confidential kv
 
 # set cors policy
 ./vault write sys/config/cors -<<EOF
@@ -57,43 +58,40 @@ EOF
 
 # create policy for password rw operations
 ./vault policy write vaulty-rw -<<EOF
-path "vaulty/metadata/*" {
+path "vaulty-default/metadata/*" {
   capabilities = ["delete", "list"]
 }
-path "vaulty/data/*" {
+path "vaulty-default/data/*" {
   capabilities = ["create", "read", "update"]
+}
+path "sys-default/mounts" {
+  capabilities = ["read"]
 }
 EOF
 
 # create policy for password ro operations
 ./vault policy write vaulty-ro -<<EOF
-path "vaulty/metadata/*" {
+path "vaulty-default/metadata/*" {
   capabilities = ["list"]
 }
-path "vaulty/data/*" {
+path "vaulty-default/data/*" {
+  capabilities = ["read"]
+}
+path "sys-default/mounts" {
   capabilities = ["read"]
 }
 EOF
 
-# create policy for password ro operations (without access on customers subfolder)
-./vault policy write vaulty-no-customers -<<EOF
-path "vaulty/metadata/*" {
-  capabilities = ["list"]
+# create policy for password rw operations on the confidential mount
+./vault policy write confidential-rw -<<EOF
+path "vaulty-confidential/metadata/*" {
+  capabilities = ["delete", "list"]
 }
-path "vaulty/data/*" {
+path "vaulty-confidential/data/*" {
+  capabilities = ["create", "read", "update"]
+}
+path "sys-default/mounts" {
   capabilities = ["read"]
-}
-path "vaulty/data/customers/" {
-  capabilities = ["deny"]
-}
-path "vaulty/metadata/customers/" {
-  capabilities = ["deny"]
-}
-path "vaulty/metadata/customers/*" {
-  capabilities = ["deny"]
-}
-path "vaulty/data/customers/*" {
-  capabilities = ["deny"]
 }
 EOF
 
@@ -112,19 +110,20 @@ EOF
 	policies=vaulty-ro \
 	ttl=3600
 
-# create test user with vaulty-no-customers policy
-./vault write auth/userpass/users/$TEST_USER-no-customers \
+# create test user with confidential-rw policy
+./vault write auth/userpass/users/$TEST_USER-confidential \
 	password=$TEST_PASS \
-	policies=vaulty-no-customers \
+	policies=confidential-rw\
 	ttl=3600
 
 # setup ldap auth via script (if available)
-source ./setup-ldap-auth.sh || true
+# source ./setup-ldap-auth.sh || true
 
 # insert some data
-./vault kv put vaulty/test-username value=theusername
-./vault kv put vaulty/test-password value=thepassword
-./vault kv put vaulty/customers/github/website value="http://www.github.com"
+./vault kv put vaulty-default/test-username value=theusername
+./vault kv put vaulty-default/test-password value=thepassword
+./vault kv put vaulty-default/customers/github/website value="http://www.github.com"
+./vault kv put vaulty-confidential/mastercode-of-doom value=ilikebigbutts
 
 GR='\033[0;32m'
 NC='\033[0m'

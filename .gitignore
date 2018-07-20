@@ -22,5 +22,6 @@ package-lock.json
 yarn.lock
 
 .idea/
+vaulty.iml
 
 setup-ldap-auth.sh

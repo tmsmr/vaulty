@@ -86,14 +86,18 @@ const Actions = {
     store.auth = null;
     Actions.open(store, "Login");
   },
+  secretsSortComp: (a, b) => {
+    if(a.item.toLowerCase() > b.item.toLowerCase()) return 1;
+    return -1;
+  },
   fetchSecretKeys: (store, path) => {
     return API.list(store.endpoint, store.mount, store.auth.client_token, path).then(list => {
       const folders = list.filter(key => key.endsWith("/"))
         .map(item => ({item, folder: true}))
-        .sort((a, b) => a.item > b.item);
+        .sort(Actions.secretsSortComp);
       const secrets = list.filter(key => !key.endsWith("/"))
         .map(item => ({item, folder: false, value: null}))
-        .sort((a, b) => a.item > b.item);
+        .sort(Actions.secretsSortComp);
       store.secrets = folders.concat(secrets);
       let pathelems = [""];
       pathelems.push(...path.split("/").filter(elem => elem.length > 0));

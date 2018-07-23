@@ -90,10 +90,10 @@ const Actions = {
     return API.list(store.endpoint, store.mount, store.auth.client_token, path).then(list => {
       const folders = list.filter(key => key.endsWith("/"))
         .map(item => ({item, folder: true}))
-        .sort();
+        .sort((a, b) => a.item > b.item);
       const secrets = list.filter(key => !key.endsWith("/"))
         .map(item => ({item, folder: false, value: null}))
-        .sort();
+        .sort((a, b) => a.item > b.item);
       store.secrets = folders.concat(secrets);
       let pathelems = [""];
       pathelems.push(...path.split("/").filter(elem => elem.length > 0));

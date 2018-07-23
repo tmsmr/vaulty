@@ -23,7 +23,7 @@ function guessSecretType(item, value) {
   if (item.toLowerCase().includes("password") || item.toLowerCase().includes("passwort")) return SECRET_TYPES.PASSWORD;
   if (item.toLowerCase().includes("username") || item.toLowerCase().includes("benutzername")) return SECRET_TYPES.USERNAME;
   if (value) {
-    if (value.toLowerCase().startsWith("http://")) return SECRET_TYPES.HREF;
+    if (value.toLowerCase().startsWith("http://") || value.toLowerCase().startsWith("https://")) return SECRET_TYPES.HREF;
   }
   return SECRET_TYPES.PLAIN;
 }
